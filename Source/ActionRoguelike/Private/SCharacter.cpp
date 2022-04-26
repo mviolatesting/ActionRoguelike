@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SInteractionComponent.h"
 #include "SAttributeComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -104,7 +105,23 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	{
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
-		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+		FVector CameraLocationEnd = CameraLocation
+			+ (10000.0f * PlayerController->PlayerCameraManager->GetCameraRotation().Vector());
+		FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams();
+		FHitResult Hit;
+
+		FTransform SpawnTM;
+		if (GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, CameraLocationEnd, ObjectQueryParams))
+		{
+			FRotator projectileRotation = (Hit.Location - HandLocation).Rotation();
+			SpawnTM = FTransform(projectileRotation, HandLocation);
+		}
+		else
+		{
+			SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		}
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
