@@ -10,6 +10,38 @@
 #include "SAttributeComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ProjectileSubClass)
+{
+	if (ensure(ProjectileSubClass))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+		FVector CameraLocationEnd = CameraLocation
+			+ (10000.0f * PlayerController->PlayerCameraManager->GetCameraRotation().Vector());
+		FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams();
+		FHitResult Hit;
+
+		FTransform SpawnTM;
+		if (GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, CameraLocationEnd, ObjectQueryParams))
+		{
+			FRotator projectileRotation = (Hit.Location - HandLocation).Rotation();
+			SpawnTM = FTransform(projectileRotation, HandLocation);
+		}
+		else
+		{
+			SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		}
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		GetWorld()->SpawnActor<AActor>(ProjectileSubClass, SpawnTM, SpawnParams);
+	}
+}
+
 // Sets default values
 ASCharacter::ASCharacter()
 {
@@ -58,6 +90,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	
+	PlayerInputComponent->BindAction("SpecialAttack1", IE_Pressed, this, &ASCharacter::SpecialAttack1);
+	PlayerInputComponent->BindAction("SpecialAttack2", IE_Pressed, this, &ASCharacter::SpecialAttack2);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 }
@@ -98,37 +133,27 @@ void ASCharacter::PrimaryAttack()
 	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
 }
 
+void ASCharacter::SpecialAttack1()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SpecialAttack1, this, &ASCharacter::SpecialAttack1_TimeElapsed, 0.2f);
+}
+
+void ASCharacter::SpecialAttack2()
+{
+	
+}
+
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
-	if (ensure(ProjectileClass))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	SpawnProjectile(ProjectileClass);
+}
 
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
-		FVector CameraLocationEnd = CameraLocation
-			+ (10000.0f * PlayerController->PlayerCameraManager->GetCameraRotation().Vector());
-		FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams();
-		FHitResult Hit;
-
-		FTransform SpawnTM;
-		if (GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, CameraLocationEnd, ObjectQueryParams))
-		{
-			FRotator projectileRotation = (Hit.Location - HandLocation).Rotation();
-			SpawnTM = FTransform(projectileRotation, HandLocation);
-		}
-		else
-		{
-			SpawnTM = FTransform(GetControlRotation(), HandLocation);
-		}
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-	}
+void ASCharacter::SpecialAttack1_TimeElapsed()
+{
+	SpawnProjectile(BlackHoleProjectileClass);
 }
 
 
