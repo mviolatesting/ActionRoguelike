@@ -33,7 +33,8 @@ void ABlackHoleProjectile::Destroy_TimeElapsed()
 }
 
 void ABlackHoleProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+                                          bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
@@ -45,7 +46,8 @@ void ABlackHoleProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 void ABlackHoleProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(TimerHandle_Destroy, this, &ABlackHoleProjectile::Destroy_TimeElapsed, 5.0f);
+	GetWorldTimerManager().SetTimer(TimerHandle_Destroy, this,
+		&ABlackHoleProjectile::Destroy_TimeElapsed, 5.0f);
 }
 
 

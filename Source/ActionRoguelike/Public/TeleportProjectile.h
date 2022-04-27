@@ -1,32 +1,34 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BlackHoleProjectile.generated.h"
+#include "TeleportProjectile.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
 
 UCLASS()
-class ACTIONROGUELIKE_API ABlackHoleProjectile : public AActor
+class ACTIONROGUELIKE_API ATeleportProjectile : public AActor
 {
 	GENERATED_BODY()
 	
-public:
-	
-	ABlackHoleProjectile();
+public:	
+
+	ATeleportProjectile();
 
 protected:
 
-	void Destroy_TimeElapsed();
+	void ShowExplosion();
+	void TeleportInstigator();
+
+	void ShowExplosion_TimeElapsed();
+	void TeleportInstigator_TimeElapsed();
 	
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComp;
 
@@ -37,8 +39,9 @@ protected:
 	UParticleSystemComponent* EffectComp;
 	
 	virtual void BeginPlay() override;
-
-	FTimerHandle TimerHandle_Destroy;
+	
+	FTimerHandle TimerHandle_Explode;	
+	FTimerHandle TimerHandle_Teleport;
 
 public:	
 

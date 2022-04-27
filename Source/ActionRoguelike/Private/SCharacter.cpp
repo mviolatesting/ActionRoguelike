@@ -97,7 +97,6 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 }
 
-
 void ASCharacter::MoveForward(float Value)
 {
 	FRotator ControlRot = GetControlRotation();
@@ -106,7 +105,6 @@ void ASCharacter::MoveForward(float Value)
 
 	AddMovementInput(ControlRot.Vector(), Value);
 }
-
 
 void ASCharacter::MoveRight(float Value)
 {
@@ -123,28 +121,29 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-
 void ASCharacter::PrimaryAttack()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-
-	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,
+		&ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
 }
 
 void ASCharacter::SpecialAttack1()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpecialAttack1, this, &ASCharacter::SpecialAttack1_TimeElapsed, 0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpecialAttack1, this,
+		&ASCharacter::SpecialAttack1_TimeElapsed, 0.2f);
 }
 
 void ASCharacter::SpecialAttack2()
 {
-	
-}
+	PlayAnimMontage(AttackAnim);
 
+	GetWorldTimerManager().SetTimer(TimerHandle_SpecialAttack2, this,
+		&ASCharacter::SpecialAttack2_TimeElapsed, 0.2f);
+}
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
@@ -156,6 +155,10 @@ void ASCharacter::SpecialAttack1_TimeElapsed()
 	SpawnProjectile(BlackHoleProjectileClass);
 }
 
+void ASCharacter::SpecialAttack2_TimeElapsed()
+{
+	SpawnProjectile(TeleportProjectileClass);
+}
 
 void ASCharacter::PrimaryInteract()
 {
