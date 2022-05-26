@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
 #include "SCharacter.generated.h"
 
 class UCameraComponent;
@@ -37,6 +38,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	float AttackAnimDelay;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	float HitFlashSpeed = 4.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	FLinearColor HitFlashColor;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
