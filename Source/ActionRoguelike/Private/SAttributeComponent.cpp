@@ -18,7 +18,13 @@ bool USAttributeComponent::IsAlive() const
 
 bool USAttributeComponent::ApplyHealthChange(float Delta)
 {
+	float PrevHealth = Health;
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+
+	if (PrevHealth == Health)
+	{
+		return false;
+	}
 
 	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 
