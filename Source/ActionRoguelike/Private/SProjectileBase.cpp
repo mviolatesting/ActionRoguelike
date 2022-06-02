@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundCue.h"
-#include "Camera/CameraShake.h"
+#include "MatineeCameraShake.h"
 
 
 ASProjectileBase::ASProjectileBase()
